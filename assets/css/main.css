@@ -1,0 +1,124 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+/* 儿童友好的全局样式 */
+:root {
+  /* 儿童友好的颜色调色板 */
+  --color-primary: #ff6b9d;      /* 粉红色 */
+  --color-secondary: #4ecdc4;    /* 青绿色 */
+  --color-accent: #ffe66d;       /* 黄色 */
+  --color-success: #95e1d3;      /* 薄荷绿 */
+  --color-warning: #ffa726;      /* 橙色 */
+  --color-star: #ffd700;         /* 金色星星 */
+  --color-bg-soft: #fef7ff;      /* 柔和背景 */
+  --color-text-primary: #2d3748; /* 深灰文字 */
+  --color-text-soft: #718096;    /* 柔和文字 */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background: linear-gradient(135deg, #fef7ff 0%, #e6f3ff 100%);
+  min-height: 100vh;
+  color: var(--color-text-primary);
+}
+
+/* 儿童友好的按钮样式 */
+.btn-primary {
+  @apply bg-pink-400 hover:bg-pink-500 text-white font-semibold py-3 px-6 rounded-full shadow-lg transform transition-all duration-200 hover:scale-105;
+}
+
+.btn-secondary {
+  @apply bg-teal-400 hover:bg-teal-500 text-white font-semibold py-3 px-6 rounded-full shadow-lg transform transition-all duration-200 hover:scale-105;
+}
+
+.btn-accent {
+  @apply bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-semibold py-3 px-6 rounded-full shadow-lg transform transition-all duration-200 hover:scale-105;
+}
+
+/* 卡片样式 */
+.card {
+  @apply bg-white rounded-2xl shadow-lg p-6 border-2 border-pink-100;
+}
+
+.card-hover {
+  @apply transform transition-all duration-200 hover:scale-105 hover:shadow-xl;
+}
+
+/* 星星动画 */
+.star {
+  color: var(--color-star);
+  filter: drop-shadow(0 0 6px rgba(255, 215, 0, 0.6));
+}
+
+.star-bounce {
+  animation: starBounce 0.6s ease-in-out;
+}
+
+@keyframes starBounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.3); }
+}
+
+/* 可爱的输入框样式 */
+.input-cute {
+  @apply w-full px-4 py-3 rounded-xl border-2 border-pink-200 focus:border-pink-400 focus:outline-none transition-colors duration-200;
+}
+
+/* 日历样式 */
+.calendar-day {
+  @apply w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all duration-200;
+}
+
+.calendar-day-today {
+  @apply bg-pink-400 text-white;
+}
+
+.calendar-day-has-record {
+  @apply bg-yellow-200 text-gray-800 relative;
+}
+
+.calendar-day-has-record::after {
+  content: '⭐';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  font-size: 8px;
+}
+
+/* 任务列表样式 */
+.task-item {
+  @apply bg-white rounded-xl p-4 border-2 border-gray-100 hover:border-pink-200 transition-all duration-200;
+}
+
+.task-completed {
+  @apply bg-green-50 border-green-200;
+}
+
+/* 奖励卡片样式 */
+.reward-card {
+  @apply bg-gradient-to-br from-purple-100 to-pink-100 rounded-2xl p-6 border-2 border-purple-200;
+}
+
+.reward-available {
+  @apply hover:from-purple-200 hover:to-pink-200 cursor-pointer transform transition-all duration-200 hover:scale-105;
+}
+
+.reward-unavailable {
+  @apply opacity-60 cursor-not-allowed;
+}
+
+/* 响应式设计 */
+@media (max-width: 640px) {
+  .card {
+    @apply p-4;
+  }
+  
+  .btn-primary, .btn-secondary, .btn-accent {
+    @apply py-2 px-4 text-sm;
+  }
+} 

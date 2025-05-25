@@ -1,0 +1,37 @@
+{
+  "name": "little-star-h5",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare",
+    "setup": "node scripts/setup-env.js",
+    "db:init": "node scripts/init-db.js",
+    "db:help": "echo '请访问 Supabase SQL Editor 并执行 scripts/init-database.sql 文件'"
+  },
+  "dependencies": {
+    "@nuxtjs/supabase": "^1.4.8",
+    "@pinia/nuxt": "^0.5.5",
+    "@vueuse/core": "^11.3.0",
+    "@vueuse/nuxt": "^11.3.0",
+    "date-fns": "^4.1.0",
+    "nuxt": "^3.17.4",
+    "pinia": "^2.2.8",
+    "vue": "^3.5.14",
+    "vue-router": "^4.5.1"
+  },
+  "devDependencies": {
+    "@iconify-json/noto": "^1.2.3",
+    "@iconify-json/ph": "^1.2.1",
+    "@nuxtjs/color-mode": "^3.5.2",
+    "@nuxtjs/google-fonts": "^3.2.0",
+    "@nuxtjs/tailwindcss": "^6.12.1",
+    "dotenv": "^16.5.0",
+    "naive-ui": "^2.41.0",
+    "unplugin-icons": "^0.20.0",
+    "vfonts": "^0.0.3"
+  }
+}
