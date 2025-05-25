@@ -2,6 +2,10 @@ name: Debug Secrets
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
 
 jobs:
   debug:
@@ -72,7 +76,6 @@ jobs:
           SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
 
       - name: Test SSH Key Format
-        if: ${{ secrets.SERVER_SSH_KEY }}
         run: |
           echo "=== Testing SSH Key Format ==="
 
@@ -93,7 +96,6 @@ jobs:
           rm -f /tmp/test_key
 
       - name: Test Network Connectivity
-        if: ${{ secrets.SERVER_HOST }}
         run: |
           echo "=== Testing Network Connectivity ==="
 
@@ -112,7 +114,6 @@ jobs:
           fi
 
       - name: Test SSH Connection
-        if: ${{ secrets.SERVER_HOST && secrets.SERVER_USER && secrets.SERVER_SSH_KEY }}
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.SERVER_HOST }}
