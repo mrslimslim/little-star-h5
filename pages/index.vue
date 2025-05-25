@@ -153,14 +153,7 @@ const calendarDays = ref<CalendarDay[]>([]);
 const dailyRecords = ref<DailyRecord[]>([]);
 const isLoading = ref(false);
 
-// Supabase客户端 - 添加错误处理
-let supabase: any = null;
-try {
-  supabase = useSupabaseClient();
-} catch (error) {
-  console.warn('Supabase client initialization failed:', error);
-  supabase = null;
-}
+// 注意：已迁移到服务端 API，不再使用客户端 Supabase
 
 // 计算属性
 const currentMonthYear = computed(() => {

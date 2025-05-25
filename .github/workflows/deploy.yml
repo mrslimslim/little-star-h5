@@ -13,109 +13,109 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
 
-    - name: Create .env file
-      run: |
-        echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
-        echo "SUPABASE_ANON_KEY=${{ secrets.SUPABASE_KEY}}" >> .env
-        echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env
+      - name: Create .env file
+        run: |
+          echo "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" >> .env
+          echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY}}" >> .env
+          echo "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" >> .env
 
-    - name: Install dependencies
-      run: npm ci
+      - name: Install dependencies
+        run: npm ci
 
-    - name: Build application
-      run: npm run build
+      - name: Build application
+        run: npm run build
 
-    - name: Create deployment package
-      run: |
-        mkdir -p deploy-package
-        cp -r .output deploy-package/
-        cp package.json deploy-package/
-        cp package-lock.json deploy-package/
-        cp .env deploy-package/
-        if [ -d "public" ]; then
-          cp -r public deploy-package/
-        fi
-        tar -czf deploy-package.tar.gz -C deploy-package .
-
-    - name: Deploy to server
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        port: ${{ secrets.SERVER_PORT || 22 }}
-        script: |
-          APP_DIR="/opt/little-star-h5"
-          BACKUP_DIR="/opt/backups/little-star-h5"
-          SERVICE_NAME="little-star-h5"
-          
-          sudo mkdir -p $APP_DIR
-          sudo mkdir -p $BACKUP_DIR
-          
-          sudo systemctl stop $SERVICE_NAME || echo "Service not running"
-          
-          if [ -d "$APP_DIR/.output" ]; then
-            sudo cp -r $APP_DIR $BACKUP_DIR/backup-$(date +%Y%m%d-%H%M%S)
+      - name: Create deployment package
+        run: |
+          mkdir -p deploy-package
+          cp -r .output deploy-package/
+          cp package.json deploy-package/
+          cp package-lock.json deploy-package/
+          cp .env deploy-package/
+          if [ -d "public" ]; then
+            cp -r public deploy-package/
           fi
-          
-          sudo rm -rf $APP_DIR/.output
-          sudo rm -rf $APP_DIR/node_modules
+          tar -czf deploy-package.tar.gz -C deploy-package .
 
-    - name: Upload files to server
-      uses: appleboy/scp-action@v0.1.7
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        port: ${{ secrets.SERVER_PORT || 22 }}
-        source: "deploy-package.tar.gz"
-        target: "/tmp/"
+      - name: Deploy to server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            APP_DIR="/opt/little-star-h5"
+            BACKUP_DIR="/opt/backups/little-star-h5"
+            SERVICE_NAME="little-star-h5"
 
-    - name: Extract and setup application
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        port: ${{ secrets.SERVER_PORT || 22 }}
-        script: |
-          APP_DIR="/opt/little-star-h5"
-          SERVICE_NAME="little-star-h5"
-          
-          cd /tmp
-          sudo tar -xzf deploy-package.tar.gz -C $APP_DIR
-          sudo chown -R $USER:$USER $APP_DIR
-          
-          sudo systemctl start $SERVICE_NAME
-          sudo systemctl enable $SERVICE_NAME
-          
-          sleep 5
-          sudo systemctl status $SERVICE_NAME
-          rm -f /tmp/deploy-package.tar.gz
-          
-          echo "Deployment completed successfully!"
+            sudo mkdir -p $APP_DIR
+            sudo mkdir -p $BACKUP_DIR
 
-    - name: Health Check
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.SERVER_HOST }}
-        username: ${{ secrets.SERVER_USER }}
-        key: ${{ secrets.SERVER_SSH_KEY }}
-        port: ${{ secrets.SERVER_PORT || 22 }}
-        script: |
-          sleep 10
-          if netstat -tuln | grep :3000; then
-            echo "✅ Application is running on port 3000"
-          else
-            echo "❌ Application is not running on port 3000"
-            exit 1
-          fi
+            sudo systemctl stop $SERVICE_NAME || echo "Service not running"
+
+            if [ -d "$APP_DIR/.output" ]; then
+              sudo cp -r $APP_DIR $BACKUP_DIR/backup-$(date +%Y%m%d-%H%M%S)
+            fi
+
+            sudo rm -rf $APP_DIR/.output
+            sudo rm -rf $APP_DIR/node_modules
+
+      - name: Upload files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          source: "deploy-package.tar.gz"
+          target: "/tmp/"
+
+      - name: Extract and setup application
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            APP_DIR="/opt/little-star-h5"
+            SERVICE_NAME="little-star-h5"
+
+            cd /tmp
+            sudo tar -xzf deploy-package.tar.gz -C $APP_DIR
+            sudo chown -R $USER:$USER $APP_DIR
+
+            sudo systemctl start $SERVICE_NAME
+            sudo systemctl enable $SERVICE_NAME
+
+            sleep 5
+            sudo systemctl status $SERVICE_NAME
+            rm -f /tmp/deploy-package.tar.gz
+
+            echo "Deployment completed successfully!"
+
+      - name: Health Check
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          script: |
+            sleep 10
+            if netstat -tuln | grep :3000; then
+              echo "✅ Application is running on port 3000"
+            else
+              echo "❌ Application is not running on port 3000"
+              exit 1
+            fi
