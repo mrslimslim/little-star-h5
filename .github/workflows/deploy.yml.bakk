@@ -1,0 +1,130 @@
+name: Debug Secrets
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - master
+
+jobs:
+  debug:
+    name: Debug Secrets Configuration
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check Secrets Availability
+        run: |
+          echo "=== Checking Secrets ==="
+
+          # 检查服务器相关secrets
+          if [ -n "${{ secrets.SERVER_HOST }}" ]; then
+            echo "✅ SERVER_HOST is set"
+            echo "SERVER_HOST length: ${#SERVER_HOST}"
+          else
+            echo "❌ SERVER_HOST is not set"
+          fi
+
+          if [ -n "${{ secrets.SERVER_USER }}" ]; then
+            echo "✅ SERVER_USER is set: ${{ secrets.SERVER_USER }}"
+          else
+            echo "❌ SERVER_USER is not set"
+          fi
+
+          if [ -n "${{ secrets.SERVER_SSH_KEY }}" ]; then
+            echo "✅ SERVER_SSH_KEY is set"
+            echo "SSH Key length: ${#SSH_KEY}"
+            echo "SSH Key starts with: $(echo '${{ secrets.SERVER_SSH_KEY }}' | head -c 50)..."
+          else
+            echo "❌ SERVER_SSH_KEY is not set"
+          fi
+
+          if [ -n "${{ secrets.SERVER_PORT }}" ]; then
+            echo "✅ SERVER_PORT is set: ${{ secrets.SERVER_PORT }}"
+          else
+            echo "⚠️ SERVER_PORT is not set (will use default 22)"
+          fi
+
+          # 检查Supabase相关secrets
+          if [ -n "${{ secrets.SUPABASE_URL }}" ]; then
+            echo "✅ SUPABASE_URL is set"
+            echo "URL: ${{ secrets.SUPABASE_URL }}"
+          else
+            echo "❌ SUPABASE_URL is not set"
+          fi
+
+          if [ -n "${{ secrets.SUPABASE_KEY}}" ]; then
+            echo "✅ SUPABASE_KEYis set"
+            echo "Key length: ${#ANON_KEY}"
+          else
+            echo "❌ SUPABASE_KEYis not set"
+          fi
+
+          if [ -n "${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" ]; then
+            echo "✅ SUPABASE_SERVICE_ROLE_KEY is set"
+            echo "Key length: ${#SERVICE_KEY}"
+          else
+            echo "❌ SUPABASE_SERVICE_ROLE_KEY is not set"
+          fi
+        env:
+          SERVER_HOST: ${{ secrets.SERVER_HOST }}
+          SSH_KEY: ${{ secrets.SERVER_SSH_KEY }}
+          ANON_KEY: ${{ secrets.SUPABASE_KEY}}
+          SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+
+      - name: Test SSH Key Format
+        run: |
+          echo "=== Testing SSH Key Format ==="
+
+          # 将SSH密钥写入临时文件
+          echo '${{ secrets.SERVER_SSH_KEY }}' > /tmp/test_key
+
+          # 检查密钥格式
+          if ssh-keygen -l -f /tmp/test_key; then
+            echo "✅ SSH key format is valid"
+          else
+            echo "❌ SSH key format is invalid"
+            echo "Key content preview:"
+            head -n 1 /tmp/test_key
+            tail -n 1 /tmp/test_key
+          fi
+
+          # 清理临时文件
+          rm -f /tmp/test_key
+
+      - name: Test Network Connectivity
+        run: |
+          echo "=== Testing Network Connectivity ==="
+
+          # 测试ping连通性
+          if ping -c 3 ${{ secrets.SERVER_HOST }}; then
+            echo "✅ Server is reachable via ping"
+          else
+            echo "❌ Server is not reachable via ping"
+          fi
+
+          # 测试SSH端口
+          if nc -zv ${{ secrets.SERVER_HOST }} ${{ secrets.SERVER_PORT || 22 }}; then
+            echo "✅ SSH port is open"
+          else
+            echo "❌ SSH port is not accessible"
+          fi
+
+      - name: Test SSH Connection
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          port: ${{ secrets.SERVER_PORT || 22 }}
+          debug: true
+          timeout: 30s
+          script: |
+            echo "🎉 SSH connection successful!"
+            echo "Server: $(hostname)"
+            echo "User: $(whoami)"
+            echo "Date: $(date)"
+            echo "Working directory: $(pwd)"
