@@ -265,24 +265,23 @@ const fetchMonthRecords = async () => {
     const end = endOfMonth(currentDate.value);
 
     try {
-      if (supabase) {
-        const { data, error } = await supabase
-          .from("daily_records")
-          .select("*")
-          .gte("date", format(start, "yyyy-MM-dd"))
-          .lte("date", format(end, "yyyy-MM-dd"))
-          .order("date", { ascending: false });
+      // 使用服务器端 API 而不是直接 Supabase 调用
+      const response = await $fetch('/api/daily-records', {
+        query: {
+          start_date: format(start, "yyyy-MM-dd"),
+          end_date: format(end, "yyyy-MM-dd")
+        }
+      });
 
-        if (error) throw error;
-
-        dailyRecords.value = data || [];
+      if (response.success) {
+        dailyRecords.value = response.data || [];
       } else {
-        console.warn("Supabase not available, using empty data");
+        console.warn("API request failed, using empty data");
         dailyRecords.value = [];
       }
     } catch (dbError) {
-      console.warn("Database connection failed, using empty data:", dbError);
-      // 如果数据库连接失败，使用空数据，但仍然显示日历
+      console.warn("API request failed, using empty data:", dbError);
+      // 如果API请求失败，使用空数据，但仍然显示日历
       dailyRecords.value = [];
     }
     

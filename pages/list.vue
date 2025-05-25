@@ -109,7 +109,7 @@
               <div v-if="record.completed_tasks && record.completed_tasks.length > 0" class="text-sm text-gray-600">
                 <span class="mr-2">完成：</span>
                 <span 
-                  v-for="(task, index) in record.completed_tasks.slice(0, 3)"
+                  v-for="task in record.completed_tasks.slice(0, 3)"
                   :key="task.id"
                   class="inline-block bg-gray-100 rounded px-2 py-1 mr-1 mb-1"
                 >
@@ -180,8 +180,7 @@ const showBackToTop = ref(false)
 
 const pageSize = 20
 
-// Supabase客户端
-const supabase = useSupabaseClient<Database>()
+// 不再需要直接使用 Supabase 客户端，通过服务器端 API 访问
 
 // 筛选选项
 const filterOptions = [
@@ -248,24 +247,28 @@ const fetchRecords = async (loadMore = false) => {
     const from = loadMore ? currentPage.value * pageSize : 0
     const to = from + pageSize - 1
 
-    const { data, error } = await supabase
-      .from('daily_records')
-      .select(`
-        *,
-        completed_tasks (*)
-      `)
-      .order('date', { ascending: false })
-      .range(from, to)
+    // 使用服务器端 API 而不是直接 Supabase 调用
+    const response = await $fetch('/api/daily-records', {
+      query: {
+        from,
+        to,
+        order: 'date:desc'
+      }
+    })
 
-    if (error) throw error
-
-    if (loadMore) {
-      records.value.push(...(data || []))
-    } else {
-      records.value = data || []
+    if (!response.success) {
+      throw new Error('Failed to fetch records')
     }
 
-    hasMore.value = (data?.length || 0) === pageSize
+    const data = response.data || []
+
+    if (loadMore) {
+      records.value.push(...data)
+    } else {
+      records.value = data
+    }
+
+    hasMore.value = data.length === pageSize
     if (loadMore) {
       currentPage.value++
     } else {

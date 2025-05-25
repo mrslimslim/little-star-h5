@@ -236,7 +236,8 @@ const newCustomTask = ref<CustomTaskForm>({
 
 // 使用composables
 const { tasks, fetchTasks } = useTasks()
-const { addStars } = useChildStars()
+const { totalStars, fetchChildStatus } = useChildStars()
+const { fetchRecord, saveRecord: saveDailyRecord, deleteRecord: deleteDailyRecord } = useDailyRecord()
 const supabase = useSupabaseClient<Database>()
 
 // 计算属性
@@ -302,16 +303,7 @@ const removeCustomTask = (index: number) => {
 
 const loadExistingRecord = async () => {
   try {
-    const { data, error } = await supabase
-      .from('daily_records')
-      .select(`
-        *,
-        completed_tasks (*)
-      `)
-      .eq('date', dateParam)
-      .single()
-    
-    if (error && error.code !== 'PGRST116') throw error
+    const data = await fetchRecord(dateParam)
     
     if (data) {
       existingRecord.value = data

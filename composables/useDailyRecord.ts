@@ -118,6 +118,37 @@ export const useDailyRecord = () => {
       .slice(0, days);
   };
 
+  // 删除每日记录
+  const deleteRecord = async (date: string): Promise<boolean> => {
+    try {
+      isLoading.value = true;
+      error.value = null;
+
+      await $fetch(`/api/daily-records/${date}`, {
+        method: "DELETE",
+      });
+
+      // 从当前记录中移除
+      if (currentRecord.value?.date === date) {
+        currentRecord.value = null;
+      }
+
+      // 从记录列表中移除
+      const index = records.value.findIndex((record) => record.date === date);
+      if (index !== -1) {
+        records.value.splice(index, 1);
+      }
+
+      return true;
+    } catch (err) {
+      error.value = err instanceof Error ? err.message : "删除每日记录失败";
+      console.error("Error deleting daily record:", err);
+      return false;
+    } finally {
+      isLoading.value = false;
+    }
+  };
+
   // 计算连续完成天数
   const getStreakDays = (): number => {
     const sortedRecords = [...records.value].sort(
@@ -154,6 +185,7 @@ export const useDailyRecord = () => {
     fetchRecord,
     fetchRecords,
     saveRecord,
+    deleteRecord,
     hasRecord,
     getStarsForDate,
     getRecentRecords,

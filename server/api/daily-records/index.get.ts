@@ -14,7 +14,12 @@ export default defineEventHandler(async (event) => {
 
     let queryBuilder = supabase
       .from("daily_records")
-      .select("*")
+      .select(
+        `
+        *,
+        completed_tasks (*)
+      `
+      )
       .order("date", { ascending: false });
 
     // 如果指定了日期范围，添加过滤条件
@@ -26,6 +31,13 @@ export default defineEventHandler(async (event) => {
     }
     if (query.date) {
       queryBuilder = queryBuilder.eq("date", query.date as string);
+    }
+
+    // 支持分页参数
+    if (query.from !== undefined && query.to !== undefined) {
+      const from = parseInt(query.from as string);
+      const to = parseInt(query.to as string);
+      queryBuilder = queryBuilder.range(from, to);
     }
 
     const { data, error } = await queryBuilder;
