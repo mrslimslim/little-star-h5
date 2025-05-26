@@ -94,7 +94,7 @@
               <div>
                 <p class="font-semibold text-gray-800">{{ customTask.task_name }}</p>
                 <p class="text-sm text-gray-500">
-                  奖励 {{ customTask.stars_awarded }} 颗星星
+                  奖励 {{ customTask.stars_earned }} 颗星星
                 </p>
               </div>
             </div>
@@ -130,7 +130,7 @@
                 <span class="text-gray-600">-</span>
               </button>
               <span class="w-8 text-center font-semibold">{{
-                newCustomTask.stars_awarded
+                newCustomTask.stars_earned
               }}</span>
               <button
                 @click="increaseStars"
@@ -244,7 +244,7 @@ const existingRecord = ref<DailyRecord | null>(null);
 // 新自定义任务表单
 const newCustomTask = ref<CustomTaskForm>({
   task_name: "",
-  stars_awarded: 1,
+  stars_earned: 1,
 });
 
 // 使用composables
@@ -256,10 +256,7 @@ const todayStars = computed(() => {
     .filter((task) => task.is_completed)
     .reduce((sum, task) => sum + task.default_stars, 0);
 
-  const customStars = customTasks.value.reduce(
-    (sum, task) => sum + task.stars_awarded,
-    0
-  );
+  const customStars = customTasks.value.reduce((sum, task) => sum + task.stars_earned, 0);
 
   return completedStars + customStars;
 });
@@ -283,14 +280,14 @@ const toggleTask = (task: TaskWithCompletion) => {
 };
 
 const increaseStars = () => {
-  if (newCustomTask.value.stars_awarded < 10) {
-    newCustomTask.value.stars_awarded++;
+  if (newCustomTask.value.stars_earned < 10) {
+    newCustomTask.value.stars_earned++;
   }
 };
 
 const decreaseStars = () => {
-  if (newCustomTask.value.stars_awarded > 1) {
-    newCustomTask.value.stars_awarded--;
+  if (newCustomTask.value.stars_earned > 1) {
+    newCustomTask.value.stars_earned--;
   }
 };
 
@@ -299,13 +296,13 @@ const addCustomTask = () => {
 
   customTasks.value.push({
     task_name: newCustomTask.value.task_name.trim(),
-    stars_awarded: newCustomTask.value.stars_awarded,
+    stars_earned: newCustomTask.value.stars_earned,
   });
 
   // 重置表单
   newCustomTask.value = {
     task_name: "",
-    stars_awarded: 1,
+    stars_earned: 1,
   };
 };
 
@@ -334,7 +331,7 @@ const loadExistingRecord = async () => {
         data.completed_tasks?.filter((t: any) => t.is_custom) || [];
       customTasks.value = customCompletedTasks.map((t: any) => ({
         task_name: t.task_name,
-        stars_awarded: t.stars_awarded,
+        stars_earned: t.stars_earned,
       }));
     }
   } catch (error) {
@@ -355,13 +352,13 @@ const saveRecord = async () => {
         .filter((task) => task.is_completed)
         .map((task) => ({
           task_name: task.name,
-          stars_awarded: task.default_stars,
+          stars_earned: task.default_stars,
           is_custom: false,
         })),
       // 自定义任务
       ...customTasks.value.map((task) => ({
         task_name: task.task_name,
-        stars_awarded: task.stars_awarded,
+        stars_earned: task.stars_earned,
         is_custom: true,
       })),
     ];

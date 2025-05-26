@@ -10,7 +10,13 @@
     "postinstall": "nuxt prepare",
     "setup": "node scripts/setup-env.js",
     "db:init": "node scripts/init-db.js",
-    "db:help": "echo '请访问 Supabase SQL Editor 并执行 scripts/init-database.sql 文件'"
+    "db:help": "echo '请访问 Supabase SQL Editor 并执行 scripts/init-database.sql 文件'",
+    "test": "node scripts/run-tests.js all",
+    "test:api": "node scripts/run-tests.js api",
+    "test:frontend": "node scripts/run-tests.js frontend",
+    "test:report": "node scripts/run-tests.js report",
+    "test:help": "node scripts/run-tests.js help",
+    "db:migrate": "echo '请在 Supabase SQL Editor 中执行 database-migration-fix.sql 脚本'"
   },
   "dependencies": {
     "@nuxtjs/supabase": "^1.4.8",

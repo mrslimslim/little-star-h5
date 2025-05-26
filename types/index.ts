@@ -20,9 +20,9 @@ export interface CompletedTask {
   id: string;
   daily_record_id: string;
   task_name: string;
-  stars_awarded: number;
+  stars_earned: number;
   is_custom: boolean;
-  completed_at: string;
+  created_at: string;
 }
 
 export interface Reward {
@@ -69,7 +69,7 @@ export interface CreateRewardForm {
 
 export interface CustomTaskForm {
   task_name: string;
-  stars_awarded: number;
+  stars_earned: number;
 }
 
 // 视图模式
