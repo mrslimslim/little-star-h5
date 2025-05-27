@@ -99,6 +99,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
 ### useChildStars()
 - `fetchChildStatus()`: 获取儿童状态
+- `refreshStars()`: 手动刷新星星数据
 - `hasEnoughStars(required)`: 检查星星是否足够
 - `formatStars(stars)`: 格式化星星显示
 - `triggerStarAnimation()`: 触发动画效果
@@ -121,7 +122,7 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ```typescript
 // 在 Vue 组件中使用
 const { tasks, fetchTasks, createTask } = useTasks()
-const { childStatus, fetchChildStatus } = useChildStars()
+const { childStatus, fetchChildStatus, refreshStars } = useChildStars()
 
 // 获取数据
 await fetchTasks()
@@ -133,6 +134,14 @@ await createTask({
   default_stars: 2,
   icon: '📚'
 })
+
+// 在兑换奖励或完成任务后手动刷新星星数据
+await refreshStars()
+
+// 发送全局更新事件，通知其他组件刷新
+if (process.client) {
+  window.dispatchEvent(new CustomEvent('starsUpdated'))
+}
 ```
 
 ## 注意事项

@@ -27,6 +27,11 @@ export const useChildStars = () => {
     }
   };
 
+  // 手动刷新星星数据的方法
+  const refreshStars = async (): Promise<void> => {
+    await fetchChildStatus();
+  };
+
   // 检查是否有足够的星星
   const hasEnoughStars = (required: number): boolean => {
     return totalStars.value >= required;
@@ -65,6 +70,7 @@ export const useChildStars = () => {
 
     // 方法
     fetchChildStatus,
+    refreshStars,
     hasEnoughStars,
     formatStars,
     triggerStarAnimation,

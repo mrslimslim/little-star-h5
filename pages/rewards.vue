@@ -150,7 +150,7 @@ import { useRewards } from '~/composables/useRewards'
 import { useChildStars } from '~/composables/useChildStars'
 
 const { rewards, isLoading, fetchRewards, redeemReward } = useRewards()
-const { totalStars } = useChildStars()
+const { totalStars, refreshStars } = useChildStars()
 
 // 设置页面标题
 useHead({
@@ -232,6 +232,12 @@ const confirmRedeem = async (reward: Reward) => {
     if (success) {
       redeemedRewardName.value = reward.name
       showSuccessModal.value = true
+      // 兑换成功后刷新星星数据
+      await refreshStars()
+      // 发送全局更新事件，通知其他组件刷新
+      if (process.client) {
+        window.dispatchEvent(new CustomEvent('starsUpdated'))
+      }
     } else {
       alert('兑换失败，请重试')
     }

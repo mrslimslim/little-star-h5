@@ -249,6 +249,7 @@ const newCustomTask = ref<CustomTaskForm>({
 
 // 使用composables
 const { tasks, fetchTasks } = useTasks();
+const { refreshStars } = useChildStars();
 
 // 计算属性
 const todayStars = computed(() => {
@@ -376,6 +377,12 @@ const saveRecord = async () => {
     if (response.success) {
       existingRecord.value = response.data;
       showSuccess.value = true;
+      // 保存成功后刷新星星数据
+      await refreshStars();
+      // 发送全局更新事件，通知其他组件刷新
+      if (process.client) {
+        window.dispatchEvent(new CustomEvent('starsUpdated'))
+      }
     } else {
       throw new Error(response.message || "保存失败");
     }
@@ -406,6 +413,12 @@ const deleteRecord = async () => {
       availableTasks.value.forEach((task) => (task.is_completed = false));
       customTasks.value = [];
       notes.value = "";
+      // 删除成功后刷新星星数据
+      await refreshStars();
+      // 发送全局更新事件，通知其他组件刷新
+      if (process.client) {
+        window.dispatchEvent(new CustomEvent('starsUpdated'))
+      }
     } else {
       throw new Error(response.message || "删除失败");
     }
