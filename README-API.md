@@ -64,6 +64,20 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 - **GET** `/api/rewards`
 - **响应**: `{ success: boolean, data: Reward[] }`
 
+#### 创建奖励
+- **POST** `/api/rewards`
+- **请求体**: `{ name: string, description?: string, stars_cost: number, icon?: string, image_url?: string }`
+- **响应**: `{ success: boolean, data: Reward, message: string }`
+
+#### 更新奖励
+- **PUT** `/api/rewards/[id]`
+- **请求体**: `{ name?: string, description?: string, stars_cost?: number, icon?: string, image_url?: string, is_active?: boolean }`
+- **响应**: `{ success: boolean, data: Reward, message: string }`
+
+#### 删除奖励
+- **DELETE** `/api/rewards/[id]`
+- **响应**: `{ success: boolean, message: string }`
+
 #### 兑换奖励
 - **POST** `/api/rewards/redeem`
 - **请求体**: `{ reward_id: string }`
@@ -106,9 +120,13 @@ SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
 ### useRewards()
 - `fetchRewards()`: 获取奖励列表
+- `createReward(form)`: 创建新奖励
+- `updateReward(id, updates)`: 更新奖励
+- `deleteReward(id)`: 删除奖励
 - `redeemReward(id)`: 兑换奖励
 - `getRewardById(id)`: 根据ID获取奖励
 - `getAffordableRewards(stars)`: 获取可兑换奖励
+- `validateRewardForm(form)`: 验证奖励表单
 
 ## 安全性
 
