@@ -82,14 +82,6 @@ body {
   @apply bg-yellow-200 text-gray-800 relative;
 }
 
-.calendar-day-has-record::after {
-  content: '⭐';
-  position: absolute;
-  top: -2px;
-  right: -2px;
-  font-size: 8px;
-}
-
 /* 任务列表样式 */
 .task-item {
   @apply bg-white rounded-xl p-4 border-2 border-gray-100 hover:border-pink-200 transition-all duration-200;

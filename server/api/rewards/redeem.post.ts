@@ -5,11 +5,11 @@ export default defineEventHandler(async (event) => {
   try {
     const body = await readBody(event);
 
-    // 验证请求数据
-    if (!body.reward_id) {
+    // 验证请求数据 - 支持自定义消耗事件
+    if (!body.reward_id && !body.custom_event) {
       throw createError({
         statusCode: 400,
-        statusMessage: "奖励ID是必需的",
+        statusMessage: "奖励ID或自定义事件是必需的",
       });
     }
 
@@ -20,18 +20,32 @@ export default defineEventHandler(async (event) => {
       config.supabaseServiceKey
     );
 
-    // 获取奖励信息
-    const { data: reward, error: rewardError } = await supabase
-      .from("rewards")
-      .select("*")
-      .eq("id", body.reward_id)
-      .single();
+    let reward: any;
 
-    if (rewardError) {
-      throw createError({
-        statusCode: 404,
-        statusMessage: "奖励不存在",
-      });
+    // 处理自定义消耗事件或预设奖励
+    if (body.custom_event) {
+      // 自定义消耗事件
+      reward = {
+        name: body.custom_event.name,
+        stars_cost: body.custom_event.stars_cost,
+        description: "自定义消耗事件",
+      };
+    } else {
+      // 获取预设奖励信息
+      const { data: rewardData, error: rewardError } = await supabase
+        .from("rewards")
+        .select("*")
+        .eq("id", body.reward_id)
+        .single();
+
+      if (rewardError) {
+        throw createError({
+          statusCode: 404,
+          statusMessage: "奖励不存在",
+        });
+      }
+
+      reward = rewardData;
     }
 
     // 获取儿童状态
@@ -63,6 +77,7 @@ export default defineEventHandler(async (event) => {
       .insert([
         {
           reward_name: reward.name,
+          reward_description: reward.description || null,
           stars_cost: reward.stars_cost,
           redeemed_at: new Date().toISOString(),
         },
@@ -101,7 +116,9 @@ export default defineEventHandler(async (event) => {
     return {
       success: true,
       data: redemption,
-      message: `成功兑换 ${reward.name}！消耗了 ${reward.stars_cost} 颗星星`,
+      message: body.custom_event
+        ? `成功记录 ${reward.name}！消耗了 ${reward.stars_cost} 颗星星`
+        : `成功兑换 ${reward.name}！消耗了 ${reward.stars_cost} 颗星星`,
     };
   } catch (error: any) {
     console.error("Error in redeem reward API:", error);

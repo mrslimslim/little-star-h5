@@ -12,6 +12,8 @@ export interface DailyRecord {
   id: string;
   date: string;
   total_stars_earned_today: number;
+  total_stars_spent_today?: number; // 当日消耗的星星数
+  net_stars_today?: number; // 当日净增的星星数
   notes: string | null;
   created_at: string;
 }
@@ -40,6 +42,14 @@ export interface ChildStatus {
   id: number;
   total_stars: number;
   updated_at: string;
+}
+
+export interface RedeemedReward {
+  id: string;
+  reward_name: string;
+  reward_description: string | null;
+  stars_cost: number;
+  redeemed_at: string;
 }
 
 // 组合类型，用于前端展示
@@ -82,6 +92,8 @@ export interface CalendarDay {
   isToday: boolean;
   hasRecord: boolean;
   starsEarned?: number;
+  starsSpent?: number; // 当日消耗的星星数
+  netStars?: number; // 当日净增的星星数
   isCurrentMonth: boolean;
 }
 
