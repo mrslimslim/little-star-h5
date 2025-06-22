@@ -2,7 +2,7 @@
  * @Author: mrslimslim 2451319596@qq.com
  * @Date: 2025-05-25 19:03:58
  * @LastEditors: mrslimslim 2451319596@qq.com
- * @LastEditTime: 2025-05-25 21:31:53
+ * @LastEditTime: 2025-06-22 10:57:21
  * @FilePath: \little-star-h5\nuxt.config.ts
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -65,7 +65,11 @@ export default defineNuxtConfig({
       title: "小星星学习记录",
       meta: [
         { charset: "utf-8" },
-        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        {
+          name: "viewport",
+          content:
+            "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+        },
         {
           name: "description",
           content: "帮助儿童记录学习成果，收集小星星，兑换奖励的可爱H5应用",

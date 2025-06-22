@@ -44,7 +44,11 @@ useHead({
       name: "description",
       content: "帮助儿童记录学习成果，收集小星星，兑换奖励的可爱H5应用",
     },
-    { name: "viewport", content: "width=device-width, initial-scale=1" },
+    {
+      name: "viewport",
+      content:
+        "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no",
+    },
   ],
 });
 </script>
